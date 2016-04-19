@@ -2,7 +2,7 @@
 
 #echo 'exclude=pam*' >> /etc/yum.conf;yum update
 #exclude=pam; yum update
-setenforce 0; yum update
+setenforce 0; yum --assumeyes update
 yum --assumeyes install wget
 #yum -y install git
 yum --assumeyes install java-1.7.0-openjdk
