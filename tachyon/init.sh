@@ -1,23 +1,70 @@
 #!/bin/bash
 
 pushd /root > /dev/null
-case "$HADOOP_MAJOR_VERSION" in
-  1)
-    echo "Nothing to initialize for MapReduce in Hadoop 1"
-    ;;
-  2) 
-    wget http://s3.amazonaws.com/spark-related-packages/mr1-2.0.0-mr1-cdh4.2.0.tar.gz 
-    tar -xvzf mr1-*.tar.gz > /tmp/spark-ec2_mapreduce.log
-    rm mr1-*.tar.gz
-    mv hadoop-2.0.0-mr1-cdh4.2.0/ mapreduce/
-    ;;
-  yarn)
-    echo "Nothing to initialize for MapReduce in Hadoop 2 YARN"
-    ;;
 
-  *)
-     echo "ERROR: Unknown Hadoop version"
-     return -1
-esac
-/root/spark-ec2/copy-dir /root/mapreduce
+if [ -d "tachyon" ]; then
+  echo "Tachyon seems to be installed. Exiting."
+  return 0
+fi
+
+# Github tag:
+if [[ "$TACHYON_VERSION" == *\|* ]]
+then
+  # Not yet supported
+  echo "Tachyon git hashes are not yet supported. Please specify a Tachyon release version."
+# Pre-package tachyon version
+else
+  case "$TACHYON_VERSION" in
+    0.3.0)
+      wget https://s3.amazonaws.com/Tachyon/tachyon-0.3.0-bin.tar.gz
+      ;;
+    0.4.0)
+      wget https://s3.amazonaws.com/Tachyon/tachyon-0.4.0-bin.tar.gz
+      ;;
+    0.4.1)
+      wget https://s3.amazonaws.com/Tachyon/tachyon-0.4.1-bin.tar.gz
+      ;;
+    0.5.0)
+      if [[ "$HADOOP_MAJOR_VERSION" == "1" ]]; then
+        wget https://s3.amazonaws.com/Tachyon/tachyon-0.5.0-bin.tar.gz
+      else
+        wget https://s3.amazonaws.com/Tachyon/tachyon-0.5.0-cdh4-bin.tar.gz
+      fi
+      ;;
+    0.6.0)
+      if [[ "$HADOOP_MAJOR_VERSION" == "1" ]]; then
+        wget https://s3.amazonaws.com/Tachyon/tachyon-0.6.0-bin.tar.gz
+      else
+        wget https://s3.amazonaws.com/Tachyon/tachyon-0.6.0-cdh4-bin.tar.gz
+      fi
+      ;;
+    0.6.4)
+      if [[ "$HADOOP_MAJOR_VERSION" == "1" ]]; then
+        wget https://s3.amazonaws.com/Tachyon/tachyon-0.6.4-bin.tar.gz
+      elif [[ "$HADOOP_MAJOR_VERSION" == "2" ]]; then
+        wget https://s3.amazonaws.com/Tachyon/tachyon-0.6.4-cdh4-bin.tar.gz
+      else
+        wget https://s3.amazonaws.com/Tachyon/tachyon-0.6.4-hadoop2.4-bin.tar.gz
+      fi
+      ;;
+    *)
+      if [[ "$HADOOP_MAJOR_VERSION" == "1" ]]; then
+        wget https://s3.amazonaws.com/Tachyon/tachyon-$TACHYON_VERSION-bin.tar.gz
+      elif [[ "$HADOOP_MAJOR_VERSION" == "2" ]]; then
+        wget https://s3.amazonaws.com/Tachyon/tachyon-$TACHYON_VERSION-cdh4-bin.tar.gz
+      else
+        wget https://s3.amazonaws.com/Tachyon/tachyon-$TACHYON_VERSION-hadoop2.4-bin.tar.gz
+      fi
+      if [ $? != 0 ]; then
+        echo "ERROR: Unknown Tachyon version"
+        return -1
+      fi
+  esac
+
+  echo "Unpacking Tachyon"
+  tar xvzf tachyon-*.tar.gz > /tmp/spark-ec2_tachyon.log
+  rm tachyon-*.tar.gz
+  mv `ls -d tachyon-*` tachyon
+fi
+
 popd > /dev/null
