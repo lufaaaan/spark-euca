@@ -34,7 +34,7 @@ import boto
 from boto.ec2.blockdevicemapping import BlockDeviceMapping, EBSBlockDeviceType
 from boto.ec2.regioninfo import RegionInfo
 
-
+SPARK_EUCA_DIR = os.path.dirname(os.path.realpath(__file__))
 class UsageError(Exception):
   pass
 
@@ -305,13 +305,13 @@ def launch_cluster(conn, opts, cluster_name):
     #block_map["/dev/sdv"] = device
     block_map["/dev/vdb"] = device
     
-  if opts.user_data_file != None:
-      user_data_file = open(opts.user_data_file)
-      try:
-          opts.user_data = user_data_file.read()
-          #print "user data (encoded) = ", opts.user_data
-      finally:
-          user_data_file.close()
+ # if opts.user_data_file != None:
+   #   user_data_file = open(opts.user_data_file)
+     # try:
+      #    opts.user_data = user_data_file.read()
+       #   #print "user data (encoded) = ", opts.user_data
+     # finally:
+        #  user_data_file.close()
 
  
     # Launch non-spot instances
@@ -438,7 +438,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
       #ssh(master, opts, "echo 'exclude=pam*' >> /etc/yum.conf")
       ssh(master, opts, "setenforce 0") #turns off selinux without a reboot
       
-  ssh(master, opts, pkg_mngr + " update")
+  #ssh(master, opts, pkg_mngr + " update")
   #ssh(master, opts, pkg_mngr + " install wget")
   ssh(master, opts, pkg_mngr + " install git")
   
@@ -447,7 +447,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
       ssh(master, opts, "mv /usr/lib/jvm/java-7-openjdk-amd64/ /usr/lib/jvm/java-1.7.0/")
   elif opts.os_type == "centos":
       ssh(master, opts, pkg_mngr + " install java-1.7.0-openjdk")
-      ssh(master, opts, "mv /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.65.x86_64/ /usr/lib/jvm/java-1.7.0/")
+      ssh(master, opts, "mv /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.99.x86_64/ /usr/lib/jvm/java-1.7.0/")
       ssh(master, opts, pkg_mngr + " install wget")
       
   ssh(master, opts, "wget http://downloads.typesafe.com/scala/2.11.1/scala-2.11.1.tgz")
@@ -465,22 +465,28 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
   ssh(master, opts, "wget https://archive.apache.org/dist/hive/hive-0.9.0/hive-0.9.0.tar.gz") # shark 0.8.* needs hive and the shark/setup.sh script tries to rsync hive* regardless of the version used
   
   #Required packets to run MLlib
-  ssh(master, opts, pkg_mngr + " install gfortran")
-  ssh(master, opts, pkg_mngr + " install libgfortran3")
-  ssh(master, opts, pkg_mngr + " install libatlas3gf-base libopenblas-base")
-  ssh(master, opts, "update-alternatives --config libblas.so.3gf --skip-auto")
-  ssh(master, opts, "update-alternatives --config liblapack.so.3gf --skip-auto")
+  ssh(master, opts, pkg_mngr + " install gcc-gfortran")
+  #ssh(master, opts, pkg_mngr + " install libgfortran3")
+  #ssh(master, opts, pkg_mngr + " install libatlas3gf-base libopenblas-base")
+  #ssh(master, opts, "update-alternatives --config libblas.so.3gf --skip-auto")
+  #ssh(master, opts, "update-alternatives --config liblapack.so.3gf --skip-auto")
   #If we want to format the attached volume with xfs the following should not be in comments & prepare-slaves.sh should be modified as well
   #if opts.vol_size > 0:
   #    ssh(master, opts, pkg_mngr + " install xfsprogs")
   
   # NOTE: We should clone the repository before running deploy_files to
   # prevent ec2-variables.sh from being overwritten
-  ssh(master, opts, "rm -rf spark-euca && git clone https://github.com/strat0sphere/spark-euca.git")
+  ssh(master, opts, "rm -rf spark-euca && git clone https://github.com/lufaaaan/spark-euca.git")
   
   print "Deploying files to master..."
-  deploy_files(conn, "deploy.generic", opts, master_nodes, slave_nodes, modules)
-
+  deploy_files(
+        conn=conn,
+        root_dir=SPARK_EUCA_DIR + "/" + "deploy.generic",
+        opts=opts,
+        master_nodes=master_nodes,
+        slave_nodes=slave_nodes,
+        modules=modules
+    )
   print "Running setup on master..."
   ssh(master, opts, "echo '****************'; ls -al")
   #setup_standalone_cluster(master, slave_nodes, opts)
@@ -490,7 +496,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
 def setup_standalone_cluster(master, slave_nodes, opts):
   slave_ips = '\n'.join([i.public_dns_name for i in slave_nodes])
   ssh(master, opts, "echo \"%s\" > spark/conf/slaves" % (slave_ips))
-  ssh(master, opts, "/root/spark/sbin/start-all.sh")
+  #ssh(master, opts, "/root/spark/sbin/start-all.sh")
 
 def setup_spark_cluster(master, opts):
   #ssh(master, opts, "chmod u+x ~/spark-testing/setup.sh")
@@ -675,9 +681,21 @@ def ssh(host, opts, command):
       time.sleep(30)
       tries = tries + 1
 
-
+def _check_output(*popenargs, **kwargs):
+    if 'stdout' in kwargs:
+        raise ValueError('stdout argument not allowed, it will be overridden.')
+    process = subprocess.Popen(stdout=subprocess.PIPE, *popenargs, **kwargs)
+    output, unused_err = process.communicate()
+    retcode = process.poll()
+    if retcode:
+        cmd = kwargs.get("args")
+        if cmd is None:
+            cmd = popenargs[0]
+        raise subprocess.CalledProcessError(retcode, cmd, output=output)
+    return output
+    
 def ssh_read(host, opts, command):
-  return subprocess.check_output(
+  return _check_output(
       ssh_command(opts) + ['%s@%s' % (opts.user, host), stringify_command(command)])
 
 
@@ -729,7 +747,7 @@ def attach_volumes(conn, nodes, vol_size, device_name="/dev/vdb"):
 def real_main():
   (opts, action, cluster_name) = parse_args()
   try:
-    euca_ec2_host="eucalyptus.race.cs.ucsb.edu" #TODO: Replace with opts.euca-ec2-host
+    euca_ec2_host="10.50.28.101" #TODO: Replace with opts.euca-ec2-host
     euca_id=os.getenv('AWS_ACCESS_KEY')
     euca_key=os.getenv('AWS_SECRET_KEY')
     euca_region = RegionInfo(name="eucalyptus", endpoint=euca_ec2_host)
