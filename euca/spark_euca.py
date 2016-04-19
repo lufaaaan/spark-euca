@@ -462,7 +462,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
   #Download packages needed by the setup scripts on the spark-euca directory - Normally downloaded from s3.amazonaws.com
   #:q
   #ssh(master, opts, "wget https://archive.apache.org/dist/hadoop/core/hadoop-1.0.4/hadoop-1.0.4.tar.gz")
-  ssh(master, opts, "wget https://archive.apache.org/dist/hive/hive-0.9.0/hive-0.9.0.tar.gz") # shark 0.8.* needs hive and the shark/setup.sh script tries to rsync hive* regardless of the version used
+  #ssh(master, opts, "wget https://archive.apache.org/dist/hive/hive-0.9.0/hive-0.9.0.tar.gz") # shark 0.8.* needs hive and the shark/setup.sh script tries to rsync hive* regardless of the version used
   
   #Required packets to run MLlib
   ssh(master, opts, pkg_mngr + " install gcc-gfortran")
