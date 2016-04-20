@@ -19,5 +19,5 @@ case "$HADOOP_MAJOR_VERSION" in
      echo "ERROR: Unknown Hadoop version"
      return -1
 esac
-/root/spark-ec2/copy-dir /root/mapreduce
-popd > /dev/null
+/root/spark-euca/copy-dir /root/mapreduce
+popd
