@@ -447,7 +447,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
       ssh(master, opts, "mv /usr/lib/jvm/java-7-openjdk-amd64/ /usr/lib/jvm/java-1.7.0/")
   elif opts.os_type == "centos":
       ssh(master, opts, pkg_mngr + " install java-1.7.0-openjdk")
-      ssh(master, opts, "mv /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.99.x86_64/ /usr/lib/jvm/java-1.7.0/")
+      ssh(master, opts, "mv /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.99.x86_64/jre /usr/lib/jvm/java-1.7.0/")
       ssh(master, opts, pkg_mngr + " install wget")
       
   ssh(master, opts, "wget http://downloads.typesafe.com/scala/2.11.1/scala-2.11.1.tgz")
