@@ -61,10 +61,10 @@ else
       fi
   esac
 
-  echo "Unpacking Tachyon"
-  tar xvzf tachyon-*.tar.gz > /tmp/spark-ec2_tachyon.log
+echo "Unpacking Tachyon"
+  tar xvzf tachyon-*.tar.gz > /tmp/spark-euca_tachyon.log
   rm tachyon-*.tar.gz
   mv `ls -d tachyon-*` tachyon
 fi
 
-popd > /dev/null
+popd
