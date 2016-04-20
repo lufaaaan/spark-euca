@@ -138,10 +138,15 @@ else
       fi
   esac
 
+  #Make sure there is a spark copy
+  #wget http://www.apache.org/dist/spark/spark-1.0.0/spark-1.0.0-bin-hadoop1.tgz
   echo "Unpacking Spark"
-  tar xvzf spark-*.tgz > /tmp/spark-ec2_spark.log
+  tar xvzf spark-*.tgz > /tmp/spark-euca_spark.log
   rm spark-*.tgz
-  mv `ls -d spark-* | grep -v ec2` spark
+  mv `ls -d spark-* | grep -v euca` spark
+  ls -al
+  #Makes sure the name is changed
+  #mv spark-1.0.0-bin-hadoop1 spark #If the above works this should be redundant and fail
 fi
 
-popd > /dev/null
+popd
