@@ -28,7 +28,7 @@ fi
 
 echo "Starting ephemeral HDFS..."
 # This is different depending on version. Simple hack: just try both.
-$EPHEMERAL_HDFS/sbin/start-dfs.sh
+#$EPHEMERAL_HDFS/sbin/start-dfs.sh
 $EPHEMERAL_HDFS/bin/start-dfs.sh
 
 popd
