@@ -442,22 +442,22 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
   #ssh(master, opts, pkg_mngr + " install wget")
   ssh(master, opts, pkg_mngr + " install git")
   
-  if opts.os_type == "ubuntu":
-      ssh(master, opts, pkg_mngr + " install openjdk-7-jdk")
-      ssh(master, opts, "mv /usr/lib/jvm/java-7-openjdk-amd64/ /usr/lib/jvm/java-1.7.0/")
-  elif opts.os_type == "centos":
-      ssh(master, opts, pkg_mngr + " install java-1.7.0-openjdk")
-      ssh(master, opts, "mv /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.99.x86_64/jre /usr/lib/jvm/java-1.7.0/")
-      ssh(master, opts, pkg_mngr + " install wget")
+  #if opts.os_type == "ubuntu":
+     # ssh(master, opts, pkg_mngr + " install openjdk-7-jdk")
+     # ssh(master, opts, "mv /usr/lib/jvm/java-7-openjdk-amd64/ /usr/lib/jvm/java-1.7.0/")
+  #elif opts.os_type == "centos":
+     # ssh(master, opts, pkg_mngr + " install java-1.7.0-openjdk")
+      #ssh(master, opts, "mv /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.99.x86_64/jre /usr/lib/jvm/java-1.7.0/")
+      #ssh(master, opts, pkg_mngr + " install wget")
       
   ssh(master, opts, "wget http://downloads.typesafe.com/scala/2.11.1/scala-2.11.1.tgz")
   ssh(master, opts, "tar xvf scala-2.11.1.tgz")
   ssh(master, opts, "mv scala-2.11.1 scala")
   ssh(master, opts, "rm scala-2.11.1.tgz")
   
-  ssh(master, opts, "echo JAVA_HOME='/usr/lib/jvm/java-1.7.0'  >> /etc/environment")
+  ssh(master, opts, "echo JAVA_HOME='/usr/java/jdk1.8.0_25'  >> /etc/environment")
   ssh(master, opts, "echo SCALA_HOME='/root/scala' >> /etc/environment")
-  ssh(master, opts, "echo PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/root/scala/bin:/usr/lib/jvm/java-1.7.0/bin' >> /etc/environment")
+  ssh(master, opts, "echo PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/root/scala/bin:/usr/java/jdk1.8.0_25/bin' >> /etc/environment")
        
   #Download packages needed by the setup scripts on the spark-euca directory - Normally downloaded from s3.amazonaws.com
   #:q
