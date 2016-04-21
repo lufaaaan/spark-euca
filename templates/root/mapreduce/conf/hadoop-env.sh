@@ -6,7 +6,7 @@
 # remote nodes.
 
 # The java implementation to use.  Required.
-export JAVA_HOME=/usr/lib/jvm/java-1.7.0
+export JAVA_HOME=/usr/java/jdk1.8.0_25
 
 # Extra Java CLASSPATH elements.  Optional.
 # export HADOOP_CLASSPATH=
