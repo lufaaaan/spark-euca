@@ -62,6 +62,7 @@ else
   esac
 
 echo "Unpacking Tachyon"
+  cd /root/spark-euca
   tar xvzf tachyon-*.tar.gz > /tmp/spark-euca_tachyon.log
   rm tachyon-*.tar.gz
   mv `ls -d tachyon-*` tachyon
