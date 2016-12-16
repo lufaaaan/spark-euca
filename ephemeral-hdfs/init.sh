@@ -9,7 +9,7 @@ fi
 
 case "$HADOOP_MAJOR_VERSION" in
   1)
-    wget http://s3.amazonaws.com/spark-related-packages/hadoop-1.0.4.tar.gz
+    wget http://archive.apache.org/dist/hadoop/common/hadoop-1.0.4/hadoop-1.0.4.tar.gz
     echo "Unpacking Hadoop"
     tar xvzf hadoop-1.0.4.tar.gz > /tmp/spark-ec2_hadoop.log
     rm hadoop-*.tar.gz
