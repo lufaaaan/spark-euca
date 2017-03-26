@@ -21,7 +21,7 @@ case "$HADOOP_MAJOR_VERSION" in
     echo "Unpacking Hadoop"
     tar xvzf hadoop-*.tar.gz > /tmp/spark-euca_hadoop.log
     rm hadoop-*.tar.gz
-    mv hadoop-2.0.0-cdh4.2.0/ persistent-hdfs/
+    mv hadoop-2.4.0/ persistent-hdfs/
 
     # Have single conf dir
     rm -rf /root/persistent-hdfs/etc/hadoop/
